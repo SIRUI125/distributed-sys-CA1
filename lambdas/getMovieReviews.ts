@@ -5,7 +5,7 @@ import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 const ddbClient = new DynamoDBClient({ region: process.env.REGION });
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 
-export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
+export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   try {
     console.log("Event: ", event);
     const movieId = event.pathParameters?.movieId;
@@ -15,69 +15,49 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     if (!movieId) {
       return {
         statusCode: 400,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ Message: "Missing movieId path parameter" }),
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "Missing or invalid movieId" }),
       };
     }
 
-    let filterExpression = "";
-    let expressionAttributeValues = {
-      ":movieId": movieId,
-    };
+    let expression = "movieId = :movieId";
+    let expressionValues = { ":movieId": movieId };
 
     if (minRating) {
-      filterExpression += "rating >= :minRating";
-      expressionAttributeValues[":minRating"] = minRating;
+      expression += " and rating >= :minRating";
+      expressionValues[":minRating"] = minRating;
     }
 
     if (maxRating) {
-      if (filterExpression.length > 0) {
-        filterExpression += " AND ";
-      }
-      filterExpression += "rating <= :maxRating";
-      expressionAttributeValues[":maxRating"] = maxRating;
+      expression += " and rating <= :maxRating";
+      expressionValues[":maxRating"] = maxRating;
     }
 
-    const commandOutput = await docClient.send(
-      new QueryCommand({
-        TableName: process.env.TABLE_NAME,
-        KeyConditionExpression: "movieId = :movieId",
-        ExpressionAttributeValues: expressionAttributeValues,
-        FilterExpression: filterExpression.length > 0 ? filterExpression : undefined,
-      })
-    );
+    const commandOutput = await docClient.send(new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      KeyConditionExpression: expression,
+      ExpressionAttributeValues: expressionValues,
+    }));
 
     if (!commandOutput.Items || commandOutput.Items.length === 0) {
       return {
         statusCode: 404,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ Message: "No reviews found for this movieId" }),
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "No reviews found" }),
       };
     }
 
-    const body = {
-      data: commandOutput.Items,
-    };
-
     return {
       statusCode: 200,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(body),
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ data: commandOutput.Items }),
     };
   } catch (error: any) {
-    console.log(JSON.stringify(error));
+    console.error(error);
     return {
       statusCode: 500,
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ error }),
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
