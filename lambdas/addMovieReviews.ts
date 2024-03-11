@@ -34,7 +34,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ message: "Review added successfully" }),
+      body: JSON.stringify({ message: "Moive review added" }),
     };
   } catch (error: any) {
     console.error(JSON.stringify(error));
