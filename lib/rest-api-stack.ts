@@ -254,7 +254,10 @@ export class RestAPIStack extends cdk.Stack {
           new apig.LambdaIntegration(addMovieReviewsFn, { proxy: true })
         );
         
-        const reviewerSubEndpoint = movieReviewsEndpoint.addResource("{reviewerName}");
+        const reviewsEndpoint = api.root.addResource("reviews");
+        reviewsEndpoint.addMethod("GET",
+         new apig.LambdaIntegration(getReviewsFn, { proxy: true }));
+         const reviewerSubEndpoint = reviewsEndpoint.addResource("{reviewerName}");
         reviewerSubEndpoint.addMethod(
           "PUT",
           new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true })
@@ -263,10 +266,6 @@ export class RestAPIStack extends cdk.Stack {
           "GET",
           new apig.LambdaIntegration(getReviewsByReviewerFn, { proxy: true })
         );
-        
-        const reviewsEndpoint = api.root.addResource("reviews");
-        reviewsEndpoint.addMethod("GET",
-         new apig.LambdaIntegration(getReviewsFn, { proxy: true }));
 
       }
     }

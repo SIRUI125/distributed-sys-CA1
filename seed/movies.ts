@@ -351,11 +351,60 @@ export const movieCasts: MovieCast[] = [
 ];
 export const movieReviews: MovieReviews[] = [
   {
-    MovieId:333,
+    MovieId: 123,
     Reviewername: "Sirui Yao",
-    ReviewDate: "2024-3-10",
+    ReviewDate: "2024-03-10",
     Content: "Wonderful!",
-    Rating:5,
+    Rating: 5,
+  },
+  {
+    MovieId: 124,
+    Reviewername: "Alex Smith",
+    ReviewDate: "2024-03-11",
+    Content: "Quite entertaining, but a bit predictable at times.",
+    Rating: 4,
+  },
+  {
+    MovieId: 125,
+    Reviewername: "Jane Doe",
+    ReviewDate: "2024-03-09",
+    Content: "The cinematography was stunning, but the story was lacking depth.",
+    Rating: 3,
+  },
+  {
+    MovieId: 126,
+    Reviewername: "John Davis",
+    ReviewDate: "2024-03-08",
+    Content: "I did not enjoy the movie as much as I hoped.",
+    Rating: 2,
+  },
+  {
+    MovieId: 127,
+    Reviewername: "Emily Johnson",
+    ReviewDate: "2024-03-07",
+    Content: "A masterpiece of our time, absolutely brilliant!",
+    Rating: 5,
+  },
+  {
+    MovieId: 128,
+    Reviewername: "Patricia Brown",
+    ReviewDate: "2024-03-12",
+    Content: "Great performance by the lead actor, but the plot twist was quite obvious.",
+    Rating: 3,
+  },
+  {
+    MovieId: 129,
+    Reviewername: "Michael Davis",
+    ReviewDate: "2024-03-13",
+    Content: "I loved the special effects, but the story could have been better.",
+    Rating: 4,
+  },
+  {
+    MovieId: 130,
+    Reviewername: "Linda Wilson",
+    ReviewDate: "2024-03-14",
+    Content: "The movie was too long and dragged in the middle.",
+    Rating: 2,
   },
 ]
 
