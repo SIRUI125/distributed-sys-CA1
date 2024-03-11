@@ -184,6 +184,17 @@ export class RestAPIStack extends cdk.Stack {
       REGION: "eu-west-1",
     },
   });
+  const getReviewsByReviewerFn = new lambdanode.NodejsFunction(this, 'GetReviewsByReviewerFunction', {
+    architecture: lambda.Architecture.ARM_64,
+    runtime: lambda.Runtime.NODEJS_16_X,
+    entry: `${__dirname}/../lambdas/getReviewsByReviewer.ts`,
+    timeout: cdk.Duration.seconds(10),
+    memorySize: 128,
+    environment: {
+        TABLE_NAME: movieReviewsTable.tableName,
+        REGION: 'eu-west-1',
+    },
+});
         // Permissions 
         moviesTable.grantReadData(getMovieByIdFn)
         moviesTable.grantReadData(getAllMoviesFn)
@@ -195,6 +206,7 @@ export class RestAPIStack extends cdk.Stack {
         movieReviewsTable.grantReadData(getReviewsFn);
         movieReviewsTable.grantReadWriteData(addMovieReviewsFn);
         movieReviewsTable.grantReadWriteData(updateMovieReviewFn);
+        movieReviewsTable.grantReadData(getReviewsByReviewerFn);
         const api = new apig.RestApi(this, "RestAPI", {
           description: "demo api",
           deployOptions: {
@@ -241,12 +253,21 @@ export class RestAPIStack extends cdk.Stack {
           "POST",
           new apig.LambdaIntegration(addMovieReviewsFn, { proxy: true })
         );
+        
+        const reviewerSubEndpoint = movieReviewsEndpoint.addResource("{reviewerName}");
+        reviewerSubEndpoint.addMethod(
+          "PUT",
+          new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true })
+        );
+        reviewerSubEndpoint.addMethod(
+          "GET",
+          new apig.LambdaIntegration(getReviewsByReviewerFn, { proxy: true })
+        );
+        
         const reviewsEndpoint = api.root.addResource("reviews");
         reviewsEndpoint.addMethod("GET",
-         new apig.LambdaIntegration(getReviewsFn, { proxy: true })
-         );
-        const reviewerEndpoint = api.root.addResource("reviewerName");
-        reviewerEndpoint.addMethod("PUT", new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true }));
+         new apig.LambdaIntegration(getReviewsFn, { proxy: true }));
+
       }
     }
     
